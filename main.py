@@ -1,49 +1,28 @@
 import streamlit as st
+import pandas as pd
 
 # Title of the app
-st.title("My Streamlit App")
+st.title("This is my test on 1-14-2025")
 
-# Using custom CSS for styling
-st.markdown("""
-    <style>
-    .css-1v3nvj4 { 
-        color: red;
-    }
-    </style>
-""", unsafe_allow_html=True)
+# Simple text message
+st.write("Shoot for the moon")
 
-# Adding an image to the app
-st.image("path_to_image.png", caption="My Streamlit App", width=200)
+# File uploader
+uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
 
-# Creating two columns
-col1, col2 = st.columns(2)
+if uploaded_file is not None:
+    # Check if the uploaded file is a CSV or Excel file
+    if uploaded_file.name.endswith("csv"):
+        df = pd.read_csv(uploaded_file)
+    elif uploaded_file.name.endswith("xlsx"):
+        df = pd.read_excel(uploaded_file)
 
-with col1:
-    st.header("Left Column")
-    st.write("Content for the left column goes here.")
-    user_input = st.text_input("Enter your name:")
-    if user_input:
-        st.write(f"Hello, {user_input}!")
+    # Display the uploaded file's data using Pandas
+    st.write("Here is a preview of your uploaded file:")
+    st.write(df)
 
-with col2:
-    st.header("Right Column")
-    st.write("Content for the right column goes here.")
-
-# Adding an expandable section
-with st.beta_expander("Click to expand"):
-    st.write("This is a collapsible section with more information.")
-
-# Sidebar with navigation options
-st.sidebar.title("Navigation")
-option = st.sidebar.selectbox("Choose an option", ["Home", "About", "Contact"])
-
-if option == "Home":
-    st.write("This is the Home page.")
-elif option == "About":
-    st.write("This is the About page.")
-elif option == "Contact":
-    st.write("This is the Contact page.")
-
-# Displaying a simple interactive widget
-age = st.slider("Select your age", 0, 100)
-st.write(f"Your age is: {age}")
+    # You can add more analysis here if needed
+    st.write("Data Analysis Example:")
+    st.write(df.describe())  # Example of a basic summary of the data
+else:
+    st.write("Please upload a file to get started.")
