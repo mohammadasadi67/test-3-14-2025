@@ -1,28 +1,28 @@
 import streamlit as st
 import pandas as pd
+import sqlite3
+import plotly.express as px
 
-# Title of the app
-st.title("This is my test on 1-14-2025")
+# تنظیمات صفحه
+st.set_page_config(page_title="Dashboard", layout="wide")
 
-# Simple text message
-st.write("Shoot for the moon")
+# ارتباط با پایگاه داده
+conn = sqlite3.connect("data.db")  # جایگزین کن با نام دیتابیس خودت
+query = "SELECT * FROM production_data"  # جدول واقعی‌ات را جایگزین کن
+df = pd.read_sql(query, conn)
 
-# File uploader
-uploaded_file = st.file_uploader("Upload your file", type=["csv", "xlsx"])
+# نمایش شاخص‌های کلیدی عملکرد (KPIs)
+col1, col2, col3 = st.columns(3)
+col1.metric("Total Production", df["production"].sum())
+col2.metric("Average Rate", round(df["rate"].mean(), 2))
+col3.metric("Total Errors", df["errors"].sum())
 
-if uploaded_file is not None:
-    # Check if the uploaded file is a CSV or Excel file
-    if uploaded_file.name.endswith("csv"):
-        df = pd.read_csv(uploaded_file)
-    elif uploaded_file.name.endswith("xlsx"):
-        df = pd.read_excel(uploaded_file)
+# **📊 نمودار تولیدات ماهانه**
+fig = px.line(df, x="date", y="production", title="Production Over Time")
+st.plotly_chart(fig, use_container_width=True)
 
-    # Display the uploaded file's data using Pandas
-    st.write("Here is a preview of your uploaded file:")
-    st.write(df)
+# **📊 نمودار درصد خرابی‌ها**
+fig2 = px.pie(df, names="error_type", values="errors", title="Error Distribution")
+st.plotly_chart(fig2, use_container_width=True)
 
-    # You can add more analysis here if needed
-    st.write("Data Analysis Example:")
-    st.write(df.describe())  # Example of a basic summary of the data
-else:
-    st.write("Please upload a file to get started.")
+conn.close()
